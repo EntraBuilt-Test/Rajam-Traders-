@@ -26,6 +26,10 @@ export default function App() {
   const [errors, setErrors] = useState({});
   const [scrollProgress, setScrollProgress] = useState(0);
   
+  // Track scroll milestones: 
+  // 0: Welcome, 1: Name unlocked (800px), 2: Contact unlocked (1600px), 3: Appointment unlocked (2400px), 4: Solution unlocked (3200px)
+  const [maxUnlockedStep, setMaxUnlockedStep] = useState(0);
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -41,7 +45,7 @@ export default function App() {
   const canvasRef = useRef(null);
   const currentFrameIndexRef = useRef(1);
 
-  // Helper to draw an image onto the canvas (object-cover style)
+  // Helper to draw image onto fixed cover canvas
   const drawImageOnCanvas = (img) => {
     const canvas = canvasRef.current;
     if (!canvas || !img) return;
@@ -55,7 +59,6 @@ export default function App() {
 
     if (imgWidth === 0 || imgHeight === 0) return;
 
-    // Calculate scaling factor to emulate object-cover behavior
     const ratio = Math.max(canvasWidth / imgWidth, canvasHeight / imgHeight);
     const newWidth = imgWidth * ratio;
     const newHeight = imgHeight * ratio;
@@ -66,14 +69,13 @@ export default function App() {
     ctx.drawImage(img, x, y, newWidth, newHeight);
   };
 
-  // Prefetch and cache all 150 frames into memory
+  // Prefetch frames on startup
   useEffect(() => {
     const loadedImages = [];
     for (let i = 1; i <= 150; i++) {
       const img = new Image();
       img.src = `/frames/ezgif-frame-${String(i).padStart(3, '0')}.png`;
       img.onload = () => {
-        // If it's the first frame, draw it immediately
         if (i === 1) {
           drawImageOnCanvas(img);
         }
@@ -83,7 +85,7 @@ export default function App() {
     imagesRef.current = loadedImages;
   }, []);
 
-  // Handle Resize and initial setup of canvas bounds
+  // Handle Resize bounds
   useEffect(() => {
     const handleResize = () => {
       const canvas = canvasRef.current;
@@ -102,15 +104,14 @@ export default function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Track scrolling and draw corresponding frame
+  // Track scroll position to advance frames based on absolute 3200px limit
   useEffect(() => {
     const handleScroll = () => {
       if (slide !== 5) return;
       
       const scrollY = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = docHeight > 0 ? scrollY / docHeight : 0;
-      
+      // scrollProgress goes from 0.0 to 1.0 based on absolute 3200px height
+      const scrollPercent = Math.min(1.0, scrollY / 3200);
       setScrollProgress(scrollPercent);
       
       const frameIndex = Math.min(150, Math.max(1, Math.floor(scrollPercent * 149) + 1));
@@ -153,6 +154,7 @@ export default function App() {
     });
     setErrors({});
     setScrollProgress(0);
+    setMaxUnlockedStep(0);
     currentFrameIndexRef.current = 1;
     
     const firstImg = imagesRef.current[1];
@@ -167,14 +169,10 @@ export default function App() {
   const handleStartForm = () => {
     setSlide(5);
     setScrollProgress(0);
+    setMaxUnlockedStep(1); // Unlocks Step 1 scroll space (up to 800px)
     setTimeout(() => {
-      scrollToPercent(0.30);
+      window.scrollTo({ top: 800, behavior: 'smooth' });
     }, 100);
-  };
-
-  const scrollToPercent = (percent) => {
-    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    window.scrollTo({ top: maxScroll * percent, behavior: 'smooth' });
   };
 
   const handleContinueName = () => {
@@ -187,7 +185,10 @@ export default function App() {
       return;
     }
     setErrors({});
-    scrollToPercent(0.50);
+    setMaxUnlockedStep(2); // Unlocks Step 2 scroll space (up to 1600px)
+    setTimeout(() => {
+      window.scrollTo({ top: 1600, behavior: 'smooth' });
+    }, 100);
   };
 
   const handleContinueContact = () => {
@@ -206,7 +207,17 @@ export default function App() {
       return;
     }
     setErrors({});
-    scrollToPercent(0.70);
+    setMaxUnlockedStep(3); // Unlocks Step 3 scroll space (up to 2400px)
+    setTimeout(() => {
+      window.scrollTo({ top: 2400, behavior: 'smooth' });
+    }, 100);
+  };
+
+  const handleContinueAppointment = () => {
+    setMaxUnlockedStep(4); // Unlocks Step 4 scroll space (up to 3200px)
+    setTimeout(() => {
+      window.scrollTo({ top: 3200, behavior: 'smooth' });
+    }, 100);
   };
 
   const handleSubmit = () => {
@@ -227,9 +238,9 @@ export default function App() {
       
       const firstErrorField = Object.keys(finalErrors)[0];
       if (firstErrorField === 'firstName' || firstErrorField === 'lastName') {
-        scrollToPercent(0.30);
+        window.scrollTo({ top: 800, behavior: 'smooth' });
       } else {
-        scrollToPercent(0.50);
+        window.scrollTo({ top: 1600, behavior: 'smooth' });
       }
       return;
     }
@@ -240,6 +251,7 @@ export default function App() {
 
   const t = translations[lang];
 
+  // Helper to calculate card style based on scroll progress (0.0 to 1.0)
   const getCardStyle = (min, peak, max) => {
     if (slide !== 5) return { display: 'none' };
     
@@ -292,6 +304,9 @@ export default function App() {
       {/* Overlay for readable text */}
       <div className="fixed inset-0 -z-10 w-screen h-screen bg-black/35" />
 
+      {/* Language Toggle Selector */}
+      {slide !== 3 && <LangToggle currentLang={lang} setLang={setLang} />}
+
       {/* Header Bar */}
       {slide !== 3 && (
         <header className="w-full max-w-xl mx-auto px-6 py-6 flex items-center justify-between z-40 select-none">
@@ -318,49 +333,54 @@ export default function App() {
           </div>
         )}
 
+        {/* Slide 5: Scroll-Gated reveals centered in viewport */}
         {slide === 5 && (
           <div className="fixed inset-0 z-30 flex items-center justify-center px-4 pointer-events-none">
             <div className="relative w-full max-w-md h-full flex items-center justify-center">
               
-              <div style={getCardStyle(0.20, 0.30, 0.40)}>
+              {/* Card 1: Name Section (Visible: 10% - 38%, Peak: 25% [800px]) */}
+              <div style={getCardStyle(0.10, 0.25, 0.38)}>
                 <StepNameSection 
                   data={formData} 
                   updateData={updateFormData} 
                   errors={errors} 
                   onContinue={handleContinueName} 
                   t={t}
-                  isUnlocked={true}
+                  isUnlocked={maxUnlockedStep >= 1}
                 />
               </div>
               
-              <div style={getCardStyle(0.40, 0.50, 0.60)}>
+              {/* Card 2: Contact Section (Visible: 38% - 62%, Peak: 50% [1600px]) */}
+              <div style={getCardStyle(0.38, 0.50, 0.62)}>
                 <StepContactSection 
                   data={formData} 
                   updateData={updateFormData} 
                   errors={errors} 
                   onContinue={handleContinueContact} 
                   t={t}
-                  isUnlocked={true}
+                  isUnlocked={maxUnlockedStep >= 2}
                 />
               </div>
               
-              <div style={getCardStyle(0.60, 0.70, 0.80)}>
+              {/* Card 3: Appointment Section (Visible: 62% - 88%, Peak: 75% [2400px]) */}
+              <div style={getCardStyle(0.62, 0.75, 0.88)}>
                 <StepAppointmentSection 
                   data={formData} 
                   updateData={updateFormData} 
-                  onContinue={() => scrollToPercent(0.90)} 
+                  onContinue={handleContinueAppointment} 
                   t={t}
-                  isUnlocked={true}
+                  isUnlocked={maxUnlockedStep >= 3}
                 />
               </div>
               
-              <div style={getCardStyle(0.80, 0.90, 1.0)}>
+              {/* Card 4: Solution Section (Visible: 88% - 100%, Peak: 1.00 [3200px]) */}
+              <div style={getCardStyle(0.88, 1.00, 1.0)}>
                 <StepSolutionSection 
                   data={formData} 
                   updateData={updateFormData} 
                   onSubmit={handleSubmit} 
                   t={t}
-                  isUnlocked={true}
+                  isUnlocked={maxUnlockedStep >= 4}
                 />
               </div>
 
@@ -368,8 +388,12 @@ export default function App() {
           </div>
         )}
 
+        {/* Dynamic spacer that extends page scroll height ONLY as steps are unlocked */}
         {slide === 5 && (
-          <div className="h-[800vh] w-full pointer-events-none" />
+          <div 
+            style={{ height: `${maxUnlockedStep * 800}px` }} 
+            className="w-full pointer-events-none transition-[height] duration-500 ease-out" 
+          />
         )}
 
         {slide === 9 && <SubmittingLoader onComplete={() => setSlide(10)} t={t} />}
