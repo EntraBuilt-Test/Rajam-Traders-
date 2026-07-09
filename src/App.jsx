@@ -110,6 +110,14 @@ export default function App() {
           style={{ backgroundImage: `url('/background.png')` }}
         />
       )}
+
+      {/* Background image for Success/Thankyou screens */}
+      {(slide === 9 || slide === 10 || slide === 11) && (
+        <div 
+          className="fixed inset-0 -z-20 w-screen h-screen bg-cover bg-center transition-opacity duration-1000"
+          style={{ backgroundImage: `url('/thankyou%20background.jpeg')` }}
+        />
+      )}
       
       {/* Overlay for readable text */}
       <div className="fixed inset-0 -z-10 w-screen h-screen bg-black/35" />
@@ -117,10 +125,12 @@ export default function App() {
       {/* Header Bar */}
       {slide !== 3 && slide !== 4.5 && (
         <header className="w-full max-w-xl mx-auto px-6 py-6 flex items-center justify-between z-40 select-none">
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-              <Sun className="w-5 h-5 text-[#0d130e]" />
-            </div>
+          <div className="flex items-center gap-3">
+            <img 
+              src="/logo.jpeg" 
+              alt="Rajam Traders Logo" 
+              className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-emerald-500/10 border border-emerald-500/20"
+            />
             <div>
               <span className="text-white font-black text-lg tracking-tight block">RAJAM</span>
               <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest -mt-1 block">TRADERS</span>

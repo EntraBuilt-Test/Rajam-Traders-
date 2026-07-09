@@ -28,8 +28,8 @@ export function LoadingScreen({ onComplete, t }) {
     <div className="flex flex-col items-center justify-center min-h-[80vh] text-center px-4">
       <div className="relative mb-8">
         <div className="w-28 h-28 rounded-full border-4 border-emerald-500/20 border-t-emerald-400 animate-spin absolute -inset-2"></div>
-        <div className="w-24 h-24 rounded-full bg-emerald-950/40 flex items-center justify-center border border-emerald-500/30 glow-emerald animate-pulse">
-          <Sun className="w-12 h-12 text-emerald-400" />
+        <div className="w-24 h-24 rounded-full overflow-hidden bg-zinc-950 flex items-center justify-center border border-emerald-500/30 glow-emerald animate-pulse">
+          <img src="/logo.jpeg" alt="Rajam Traders Logo" className="w-full h-full object-cover" />
         </div>
       </div>
       <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2 text-glow">
@@ -57,8 +57,8 @@ export function WelcomeSection({ onStartForm, t }) {
   return (
     <div className="glass-panel p-8 md:p-12 rounded-3xl relative overflow-hidden w-full hover:border-emerald-500/20 transition-all duration-300 text-center">
       <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-emerald-500 to-teal-400"></div>
-      <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-600/30 to-teal-400/20 flex items-center justify-center border border-emerald-500/30 mb-6 mx-auto animate-float shadow-xl">
-        <Sparkles className="w-8 h-8 text-emerald-300" />
+      <div className="w-20 h-20 rounded-2xl overflow-hidden border border-emerald-500/30 mb-6 mx-auto animate-float shadow-xl">
+        <img src="/logo.jpeg" alt="Rajam Traders Logo" className="w-full h-full object-cover" />
       </div>
       <h2 className="text-zinc-400 text-xs md:text-sm font-semibold uppercase tracking-widest mb-2">
         {t.welcomeTitle}
