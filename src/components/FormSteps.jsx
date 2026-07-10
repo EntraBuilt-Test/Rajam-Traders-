@@ -29,15 +29,12 @@ export function LoadingScreen({ onComplete, t }) {
       <div className="relative mb-8">
         <div className="w-28 h-28 rounded-full border-4 border-emerald-500/20 border-t-emerald-400 animate-spin absolute -inset-2"></div>
         <div className="w-24 h-24 rounded-full overflow-hidden bg-zinc-950 flex items-center justify-center border border-emerald-500/30 glow-emerald animate-pulse">
-          <img src="/logo.jpeg" alt="Rajam Traders Logo" className="w-full h-full object-cover" />
+          <img src="/logo.jpeg" alt="RTS Green Solar Energy Solutions Logo" className="w-full h-full object-cover" />
         </div>
       </div>
-      <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2 text-glow">
-        Rajam Traders
+      <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-8 text-glow">
+        RTS Green Solar Energy Solutions
       </h1>
-      <p className="text-emerald-400 text-sm md:text-base font-medium uppercase tracking-widest mb-8">
-        {t.solarSolutions}
-      </p>
       
       <div className="w-64 bg-zinc-950/80 rounded-full h-3 border border-emerald-900/30 overflow-hidden mb-3">
         <div 
@@ -58,13 +55,13 @@ export function WelcomeSection({ onStartForm, t }) {
     <div className="glass-panel p-8 md:p-12 rounded-3xl relative overflow-hidden w-full hover:border-emerald-500/20 transition-all duration-300 text-center">
       <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-emerald-500 to-teal-400"></div>
       <div className="w-20 h-20 rounded-2xl overflow-hidden border border-emerald-500/30 mb-6 mx-auto animate-float shadow-xl">
-        <img src="/logo.jpeg" alt="Rajam Traders Logo" className="w-full h-full object-cover" />
+        <img src="/logo.jpeg" alt="RTS Green Solar Energy Solutions Logo" className="w-full h-full object-cover" />
       </div>
       <h2 className="text-zinc-400 text-xs md:text-sm font-semibold uppercase tracking-widest mb-2">
         {t.welcomeTitle}
       </h2>
       <h1 className="text-3xl md:text-4xl font-black text-white leading-tight mb-4 tracking-tight text-glow">
-        {t.welcomeSubtitle}
+        {t.welcomePageSubtitle}
       </h1>
       <p className="text-zinc-300 text-sm md:text-base font-light leading-relaxed mb-8 max-w-md mx-auto">
         {t.welcomeDesc}
@@ -414,7 +411,7 @@ export function FinalConfirmation({ onRestart, t }) {
       <div className="border-t border-zinc-800/80 pt-6 space-y-3 text-left text-xs text-zinc-400">
         <div className="flex justify-between">
           <span>{t.firstName}:</span>
-          <span className="text-zinc-200 font-medium">Rajam Traders Solar Solutions</span>
+          <span className="text-zinc-200 font-medium">RTS Green Solar Energy Solutions</span>
         </div>
         <div className="flex justify-between">
           <span>Head Office:</span>
@@ -443,6 +440,38 @@ export function UnifiedForm({ data, updateData, errors, onSubmit, t }) {
     { id: 'off-grid', label: t.offGrid, desc: 'Complete independence with battery storage.' },
     { id: 'hybrid', label: t.hybrid, desc: 'Best of both. Connected with battery backup.' },
   ];
+
+  const serviceOptions = [
+    { id: 'residential', label: t.residential, desc: t.residentialDesc },
+    { id: 'commercial', label: t.commercial, desc: t.commercialDesc },
+    { id: 'agri-pump', label: t.agriPump, desc: t.agriPumpDesc },
+  ];
+
+  const capacityOptions = [
+    { id: '1kw', label: '1 kW' },
+    { id: '2kw', label: '2 kW' },
+    { id: '3kw', label: '3 kW' },
+    { id: '5kw', label: '5 kW' },
+    { id: '7.5kw', label: '7.5 kW' },
+    { id: '10kw', label: '10 kW' },
+    { id: '15kw', label: '15 kW' },
+    { id: '20kw', label: '20 kW' },
+    { id: '25kw', label: '25 kW' },
+    { id: '50kw+', label: '50 kW+' },
+    { id: 'not-sure', label: t.notSureRecommend },
+  ];
+
+  const [burstId, setBurstId] = useState(null);
+
+  const handleCapacityClick = (id) => {
+    updateData({ capacity: id });
+    setBurstId(id);
+    setTimeout(() => {
+      setBurstId(null);
+    }, 500);
+  };
+
+
 
   return (
     <div className="w-full glass-panel p-6 md:p-8 rounded-3xl relative overflow-hidden transition-all duration-500">
@@ -625,6 +654,71 @@ export function UnifiedForm({ data, updateData, errors, onSubmit, t }) {
                       {opt.desc}
                     </p>
                   </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Section 5: Service Type */}
+        <div className="space-y-4 pt-2">
+          <h4 className="text-sm font-bold text-emerald-400 uppercase tracking-widest border-l-2 border-emerald-500 pl-2">
+            {t.serviceType}
+          </h4>
+          <div className="grid grid-cols-1 gap-3">
+            {serviceOptions.map((opt) => {
+              const selected = data.serviceType === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => updateData({ serviceType: opt.id })}
+                  className={`w-full text-left p-4 rounded-2xl border transition-all duration-300 flex items-start gap-4 cursor-pointer ${
+                    selected 
+                      ? 'border-emerald-400 bg-emerald-950/20 shadow-md shadow-emerald-500/5'
+                      : 'border-zinc-800 bg-zinc-950/20 hover:border-zinc-700/60'
+                  }`}
+                >
+                  <div className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                    selected ? 'border-emerald-400' : 'border-zinc-600'
+                  }`}>
+                    {selected && <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />}
+                  </div>
+                  <div>
+                    <h4 className={`font-bold text-sm tracking-wide ${selected ? 'text-emerald-300' : 'text-white'}`}>
+                      {opt.label}
+                    </h4>
+                    <p className="text-zinc-400 text-xs mt-1 leading-normal">
+                      {opt.desc}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Section 6: System Capacity */}
+        <div className="space-y-4 pt-2">
+          <h4 className="text-sm font-bold text-emerald-400 uppercase tracking-widest border-l-2 border-emerald-500 pl-2">
+            {t.systemCapacity}
+          </h4>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+            {capacityOptions.map((opt) => {
+              const selected = data.capacity === opt.id;
+              const isBursting = burstId === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => handleCapacityClick(opt.id)}
+                  className={`text-center py-2.5 px-3 rounded-xl border text-xs font-bold transition-all duration-200 cursor-pointer ${
+                    selected 
+                      ? 'electric-active shadow-md'
+                      : 'border-zinc-800 bg-zinc-950/20 text-zinc-300 hover:border-zinc-700/60'
+                  } ${isBursting ? 'electric-burst' : ''} ${opt.id === 'not-sure' ? 'col-span-2 sm:col-span-1' : ''}`}
+                >
+                  {opt.label}
                 </button>
               );
             })}
